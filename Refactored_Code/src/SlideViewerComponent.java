@@ -46,7 +46,7 @@ public class SlideViewerComponent extends JComponent {
 	}
 
 	public void update() {
-		this.slide = presentation.getSlideByNumber(presentation.getCurrentSlideNumber());
+		this.slide = presentation.getCurrentSlide();
 		repaint();
 		frame.setTitle(presentation.getTitle());
 	}
