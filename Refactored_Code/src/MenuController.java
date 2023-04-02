@@ -32,9 +32,9 @@ public class MenuController extends MenuBar {
 	protected static final String LOADERR = "Load Error";
 	protected static final String SAVEERR = "Save Error";
 
-	public MenuController(Frame frame, Presentation pres) {
-		parent = frame;
-		presentation = pres;
+	public MenuController(SlideViewerFrame frame) {
+		SlideViewerFrame parent = frame;
+		presentation = frame.getViewerComponent().getPresentation();
 		MenuItem menuItem;
 		Menu fileMenu = new Menu(MenuItemsNames.FILE.getName());
 		fileMenu.add(menuItem = addMenuItem(MenuItemsNames.OPEN.getName()));
@@ -49,6 +49,7 @@ public class MenuController extends MenuBar {
 					JOptionPane.showMessageDialog(parent, IOEX + exc, 
          			LOADERR, JOptionPane.ERROR_MESSAGE);
 				}
+				parent.updateSlide();
 				parent.repaint();
 			}
 		} );
@@ -57,6 +58,7 @@ public class MenuController extends MenuBar {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.clear();
 				parent.repaint();
+				parent.updateSlide();
 			}
 		});
 		fileMenu.add(menuItem = addMenuItem(MenuItemsNames.SAVE.getName()));
@@ -84,12 +86,14 @@ public class MenuController extends MenuBar {
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.nextSlide();
+				parent.updateSlide();
 			}
 		});
 		viewMenu.add(menuItem = addMenuItem(MenuItemsNames.PREV.getName()));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.prevSlide();
+				parent.updateSlide();
 			}
 		});
 		viewMenu.add(menuItem = addMenuItem(MenuItemsNames.GOTO.getName()));
@@ -98,6 +102,7 @@ public class MenuController extends MenuBar {
 				String pageNumberStr = JOptionPane.showInputDialog((Object)MenuItemsNames.PAGENR.getName());
 				int pageNumber = Integer.parseInt(pageNumberStr);
 				presentation.setSlideNumber(pageNumber - 1);
+				parent.updateSlide();
 			}
 		});
 		add(viewMenu);
