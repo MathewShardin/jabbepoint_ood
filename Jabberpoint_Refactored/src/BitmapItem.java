@@ -61,7 +61,7 @@ public class BitmapItem extends SlideItem {
                 (int) (bufferedImage.getHeight(observer)*scale), observer);
 	}
 
-	public String getStringDescription() {
+	public String toString() {
 		return "BitmapItem[" + getLevel() + "," + imageName + "]";
 	}
 }

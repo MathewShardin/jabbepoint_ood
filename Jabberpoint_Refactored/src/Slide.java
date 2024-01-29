@@ -24,7 +24,7 @@ public class Slide {
 	}
 
 	//Add a SlideItem
-	public void addSlideItem(SlideItem anItem) {
+	public void append(SlideItem anItem) {
 		items.addElement(anItem);
 	}
 
@@ -39,8 +39,8 @@ public class Slide {
 	}
 
 	//Create a TextItem out of a String and add the TextItem
-	public void addSlideItem(int level, String message) {
-		addSlideItem(new TextItem(level, message));
+	public void append(int level, String message) {
+		append(new TextItem(level, message));
 	}
 
 	//Returns the SlideItem
@@ -49,7 +49,7 @@ public class Slide {
 	}
 
 	//Return all the SlideItems in a vector
-	public Vector<SlideItem> getAllSlideItems() {
+	public Vector<SlideItem> getSlideItems() {
 		return items;
 	}
 
@@ -68,7 +68,7 @@ public class Slide {
 	    slideItem.draw(area.x, y, scale, g, style, view);
 	    y += slideItem.getBoundingBox(g, view, scale, style).height;
 	    for (int number=0; number<getSize(); number++) {
-	      slideItem = (SlideItem) getAllSlideItems().elementAt(number);
+	      slideItem = (SlideItem)getSlideItems().elementAt(number);
 	      style = JabberPoint.getStyle(slideItem.getLevel());
 	      slideItem.draw(area.x, y, scale, g, style, view);
 	      y += slideItem.getBoundingBox(g, view, scale, style).height;

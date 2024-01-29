@@ -25,6 +25,19 @@ public class MenuController extends MenuBar {
 	
 	private static final long serialVersionUID = 227L;
 	
+	protected static final String ABOUT = "About";
+	protected static final String FILE = "File";
+	protected static final String EXIT = "Exit";
+	protected static final String GOTO = "Go to";
+	protected static final String HELP = "Help";
+	protected static final String NEW = "New";
+	protected static final String NEXT = "Next";
+	protected static final String OPEN = "Open";
+	protected static final String PAGENR = "Page number?";
+	protected static final String PREV = "Prev";
+	protected static final String SAVE = "Save";
+	protected static final String VIEW = "View";
+	
 	protected static final String TESTFILE = "testPresentation.xml";
 	protected static final String SAVEFILE = "savedPresentation.xml";
 	
@@ -32,12 +45,12 @@ public class MenuController extends MenuBar {
 	protected static final String LOADERR = "Load Error";
 	protected static final String SAVEERR = "Save Error";
 
-	public MenuController(SlideViewerFrame frame) {
-		SlideViewerFrame parent = frame;
-		presentation = frame.getViewerComponent().getPresentation();
+	public MenuController(Frame frame, Presentation pres) {
+		parent = frame;
+		presentation = pres;
 		MenuItem menuItem;
-		Menu fileMenu = new Menu(MenuItemsNames.FILE.getName());
-		fileMenu.add(menuItem = addMenuItem(MenuItemsNames.OPEN.getName()));
+		Menu fileMenu = new Menu(FILE);
+		fileMenu.add(menuItem = mkMenuItem(OPEN));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.clear();
@@ -49,19 +62,17 @@ public class MenuController extends MenuBar {
 					JOptionPane.showMessageDialog(parent, IOEX + exc, 
          			LOADERR, JOptionPane.ERROR_MESSAGE);
 				}
-				parent.updateSlide();
 				parent.repaint();
 			}
 		} );
-		fileMenu.add(menuItem = addMenuItem(MenuItemsNames.NEW.getName()));
+		fileMenu.add(menuItem = mkMenuItem(NEW));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.clear();
 				parent.repaint();
-				parent.updateSlide();
 			}
 		});
-		fileMenu.add(menuItem = addMenuItem(MenuItemsNames.SAVE.getName()));
+		fileMenu.add(menuItem = mkMenuItem(SAVE));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Accessor xmlAccessor = new XMLAccessor();
@@ -74,40 +85,37 @@ public class MenuController extends MenuBar {
 			}
 		});
 		fileMenu.addSeparator();
-		fileMenu.add(menuItem = addMenuItem(MenuItemsNames.EXIT.getName()));
+		fileMenu.add(menuItem = mkMenuItem(EXIT));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.exit(0);
 			}
 		});
 		add(fileMenu);
-		Menu viewMenu = new Menu(MenuItemsNames.VIEW.getName());
-		viewMenu.add(menuItem = addMenuItem(MenuItemsNames.NEXT.getName()));
+		Menu viewMenu = new Menu(VIEW);
+		viewMenu.add(menuItem = mkMenuItem(NEXT));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.nextSlide();
-				parent.updateSlide();
 			}
 		});
-		viewMenu.add(menuItem = addMenuItem(MenuItemsNames.PREV.getName()));
+		viewMenu.add(menuItem = mkMenuItem(PREV));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				presentation.prevSlide();
-				parent.updateSlide();
 			}
 		});
-		viewMenu.add(menuItem = addMenuItem(MenuItemsNames.GOTO.getName()));
+		viewMenu.add(menuItem = mkMenuItem(GOTO));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
-				String pageNumberStr = JOptionPane.showInputDialog((Object)MenuItemsNames.PAGENR.getName());
+				String pageNumberStr = JOptionPane.showInputDialog((Object)PAGENR);
 				int pageNumber = Integer.parseInt(pageNumberStr);
 				presentation.setSlideNumber(pageNumber - 1);
-				parent.updateSlide();
 			}
 		});
 		add(viewMenu);
-		Menu helpMenu = new Menu(MenuItemsNames.HELP.getName());
-		helpMenu.add(menuItem = addMenuItem(MenuItemsNames.ABOUT.getName()));
+		Menu helpMenu = new Menu(HELP);
+		helpMenu.add(menuItem = mkMenuItem(ABOUT));
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				AboutBox.show(parent);
@@ -116,8 +124,8 @@ public class MenuController extends MenuBar {
 		setHelpMenu(helpMenu);		//Needed for portability (Motif, etc.).
 	}
 
-	//Creating a menu-item
-	public MenuItem addMenuItem(String name) {
+//Creating a menu-item
+	public MenuItem mkMenuItem(String name) {
 		return new MenuItem(name, new MenuShortcut(name.charAt(0)));
 	}
 }

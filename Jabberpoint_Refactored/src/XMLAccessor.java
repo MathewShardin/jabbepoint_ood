@@ -25,10 +25,20 @@ import org.w3c.dom.NodeList;
  * @version 1.6 2014/05/16 Sylvia Stuurman
  */
 
-public class XMLAccessor extends Accessor {
+public class XMLAccessor implements Accessor {
 	
     /** Default API to use. */
     protected static final String DEFAULT_API_TO_USE = "dom";
+    
+    /** Names of xml tags of attributes */
+    protected static final String SHOWTITLE = "showtitle";
+    protected static final String SLIDETITLE = "title";
+    protected static final String SLIDE = "slide";
+    protected static final String ITEM = "item";
+    protected static final String LEVEL = "level";
+    protected static final String KIND = "kind";
+    protected static final String TEXT = "text";
+    protected static final String IMAGE = "image";
     
     /** Text of messages */
     protected static final String PCE = "Parser Configuration Exception";
@@ -48,17 +58,17 @@ public class XMLAccessor extends Accessor {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();    
 			Document document = builder.parse(new File(filename)); //Create a JDOM document
 			Element doc = document.getDocumentElement();
-			presentation.setTitle(getTitle(doc, XMLTags.showtitle.toString()));
+			presentation.setTitle(getTitle(doc, SHOWTITLE));
 
-			NodeList slides = doc.getElementsByTagName(XMLTags.slide.toString());
+			NodeList slides = doc.getElementsByTagName(SLIDE);
 			max = slides.getLength();
 			for (slideNumber = 0; slideNumber < max; slideNumber++) {
 				Element xmlSlide = (Element) slides.item(slideNumber);
 				Slide slide = new Slide();
-				slide.setTitle(getTitle(xmlSlide, XMLTags.title.toString()));
-				presentation.appendSlide(slide);
+				slide.setTitle(getTitle(xmlSlide, SLIDETITLE));
+				presentation.append(slide);
 				
-				NodeList slideItems = xmlSlide.getElementsByTagName(XMLTags.item.toString());
+				NodeList slideItems = xmlSlide.getElementsByTagName(ITEM);
 				maxItems = slideItems.getLength();
 				for (itemNumber = 0; itemNumber < maxItems; itemNumber++) {
 					Element item = (Element) slideItems.item(itemNumber);
@@ -80,7 +90,7 @@ public class XMLAccessor extends Accessor {
 	protected void loadSlideItem(Slide slide, Element item) {
 		int level = 1; // default
 		NamedNodeMap attributes = item.getAttributes();
-		String leveltext = attributes.getNamedItem(XMLTags.level.toString()).getTextContent();
+		String leveltext = attributes.getNamedItem(LEVEL).getTextContent();
 		if (leveltext != null) {
 			try {
 				level = Integer.parseInt(leveltext);
@@ -89,13 +99,13 @@ public class XMLAccessor extends Accessor {
 				System.err.println(NFE);
 			}
 		}
-		String type = attributes.getNamedItem(XMLTags.kind.toString()).getTextContent();
-		if (XMLTags.text.toString().equals(type)) {
-			slide.addSlideItem(new TextItem(level, item.getTextContent()));
+		String type = attributes.getNamedItem(KIND).getTextContent();
+		if (TEXT.equals(type)) {
+			slide.append(new TextItem(level, item.getTextContent()));
 		}
 		else {
-			if (XMLTags.image.toString().equals(type)) {
-				slide.addSlideItem(new BitmapItem(level, item.getTextContent()));
+			if (IMAGE.equals(type)) {
+				slide.append(new BitmapItem(level, item.getTextContent()));
 			}
 			else {
 				System.err.println(UNKNOWNTYPE);
@@ -111,11 +121,11 @@ public class XMLAccessor extends Accessor {
 		out.print("<showtitle>");
 		out.print(presentation.getTitle());
 		out.println("</showtitle>");
-		for (int slideNumber = 0; slideNumber<presentation.getNumOfSlides(); slideNumber++) {
-			Slide slide = presentation.getSlideByNumber(slideNumber);
+		for (int slideNumber=0; slideNumber<presentation.getSize(); slideNumber++) {
+			Slide slide = presentation.getSlide(slideNumber);
 			out.println("<slide>");
 			out.println("<title>" + slide.getTitle() + "</title>");
-			Vector<SlideItem> slideItems = slide.getAllSlideItems();
+			Vector<SlideItem> slideItems = slide.getSlideItems();
 			for (int itemNumber = 0; itemNumber<slideItems.size(); itemNumber++) {
 				SlideItem slideItem = (SlideItem) slideItems.elementAt(itemNumber);
 				out.print("<item kind="); 

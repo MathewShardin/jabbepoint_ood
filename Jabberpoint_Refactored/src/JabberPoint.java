@@ -1,5 +1,4 @@
 import javax.swing.JOptionPane;
-
 import java.awt.*;
 import java.io.IOException;
 
@@ -27,8 +26,8 @@ public class JabberPoint {
 	public static void main(String[] argv) {
 		
 		createStyles();
-		SlideViewerFrame slideViewerFrame = new SlideViewerFrame(JABVERSION);
-		Presentation presentation = slideViewerFrame.getViewerComponent().getPresentation();
+		Presentation presentation = new Presentation();
+		new SlideViewerFrame(JABVERSION, presentation);
 		try {
 			if (argv.length == 0) { //a demo presentation
 				Accessor.getDemoAccessor().loadFile(presentation, "");
@@ -41,14 +40,6 @@ public class JabberPoint {
 					IOERR + ex, JABERR,
 					JOptionPane.ERROR_MESSAGE);
 		}
-		slideViewerFrame.updateSlide();
-	}
-
-	public static Style getStyle(int level) {
-		if (level >= styles.length) {
-			level = styles.length - 1;
-		}
-		return styles[level];
 	}
 
 	public static void createStyles() {
@@ -59,5 +50,12 @@ public class JabberPoint {
 		styles[2] = new Style(50, Color.black, 36, 10);	// style voor item-level 2
 		styles[3] = new Style(70, Color.black, 30, 10);	// style voor item-level 3
 		styles[4] = new Style(90, Color.black, 24, 10);	// style voor item-level 4
+	}
+
+	public static Style getStyle(int level) {
+		if (level >= styles.length) {
+			level = styles.length - 1;
+		}
+		return styles[level];
 	}
 }
