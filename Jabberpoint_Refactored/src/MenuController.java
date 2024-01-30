@@ -18,13 +18,9 @@ import javax.swing.JOptionPane;
  * @version 1.5 2010/03/03 Sylvia Stuurman
  * @version 1.6 2014/05/16 Sylvia Stuurman
  */
-public class MenuController extends MenuBar {
-	
-	private Frame parent; //The frame, only used as parent for the Dialogs
-	private Presentation presentation; //Commands are given to the presentation
-	
+public class MenuController extends MenuBar implements ControllerInterface {
 	private static final long serialVersionUID = 227L;
-	
+
 	protected static final String ABOUT = "About";
 	protected static final String FILE = "File";
 	protected static final String EXIT = "Exit";
@@ -37,7 +33,7 @@ public class MenuController extends MenuBar {
 	protected static final String PREV = "Prev";
 	protected static final String SAVE = "Save";
 	protected static final String VIEW = "View";
-	
+
 	protected static final String TESTFILE = "testPresentation.xml";
 	protected static final String SAVEFILE = "savedPresentation.xml";
 	
@@ -45,10 +41,13 @@ public class MenuController extends MenuBar {
 	protected static final String LOADERR = "Load Error";
 	protected static final String SAVEERR = "Save Error";
 
-	public MenuController(Frame frame, Presentation pres) {
-		parent = frame;
-		presentation = pres;
+	public MenuController() {}
+
+	public void MenuControllerRun(SlideViewerFrame parent) {
+		Presentation presentation = parent.getSlideViewerComponent().getPresentation();
+
 		MenuItem menuItem;
+
 		Menu fileMenu = new Menu(FILE);
 		fileMenu.add(menuItem = mkMenuItem(OPEN));
 		menuItem.addActionListener(new ActionListener() {
@@ -124,8 +123,14 @@ public class MenuController extends MenuBar {
 		setHelpMenu(helpMenu);		//Needed for portability (Motif, etc.).
 	}
 
-//Creating a menu-item
+	//Creating a menu-item
 	public MenuItem mkMenuItem(String name) {
 		return new MenuItem(name, new MenuShortcut(name.charAt(0)));
+	}
+
+	@Override
+	public void connectController(SlideViewerFrame viewerFrame) {
+		MenuControllerRun(viewerFrame);
+		viewerFrame.setMenuBar(this);
 	}
 }

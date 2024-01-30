@@ -24,22 +24,29 @@ public class JabberPoint {
 
 	/** The main program */
 	public static void main(String[] argv) {
-		
 		createStyles();
-		Presentation presentation = new Presentation();
-		new SlideViewerFrame(JABVERSION, presentation);
+		SlideViewerComponent viewerComponent = new SlideViewerComponent();
+		SlideViewerFrame viewerFrame = new SlideViewerFrame(JABVERSION, viewerComponent);
+		ControllerManager controllerManager = new ControllerManager(viewerFrame); //Takes all commands to presentation
+		//Attach all controllers to application
+		KeyController keyController = new KeyController();
+		MenuController menu = new MenuController();
+		controllerManager.addControllerInterface(keyController);
+		controllerManager.addControllerInterface(menu);
+
 		try {
 			if (argv.length == 0) { //a demo presentation
-				Accessor.getDemoAccessor().loadFile(presentation, "");
+				Accessor.getDemoAccessor().loadFile(viewerComponent.getPresentation(), "");
 			} else {
-				new XMLAccessor().loadFile(presentation, argv[0]);
+				new XMLAccessor().loadFile(viewerComponent.getPresentation(), argv[0]);
 			}
-			presentation.setSlideNumber(0);
+			viewerComponent.getPresentation().setSlideNumber(0);
 		} catch (IOException ex) {
 			JOptionPane.showMessageDialog(null,
 					IOERR + ex, JABERR,
 					JOptionPane.ERROR_MESSAGE);
 		}
+		controllerManager.startApplication();
 	}
 
 	public static void createStyles() {

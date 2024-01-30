@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.ImageObserver;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
@@ -18,11 +19,8 @@ import javax.swing.JFrame;
  */
 
 public class SlideViewerComponent extends JComponent {
-		
-	private Slide slide; //The current slide
 	private Font labelFont = null; //The font for labels
 	private Presentation presentation = null; //The presentation
-	private JFrame frame = null;
 	
 	private static final long serialVersionUID = 227L;
 	
@@ -34,40 +32,60 @@ public class SlideViewerComponent extends JComponent {
 	private static final int XPOS = 1100;
 	private static final int YPOS = 20;
 
-	public SlideViewerComponent(Presentation pres, JFrame frame) {
+	public SlideViewerComponent() {
 		setBackground(BGCOLOR); 
-		presentation = pres;
+		this.presentation = new Presentation();
 		labelFont = new Font(FONTNAME, FONTSTYLE, FONTHEIGHT);
-		this.frame = frame;
 	}
 
-	public Dimension getPreferredSize() {
-		return new Dimension(Slide.WIDTH, Slide.HEIGHT);
+	public Presentation getPresentation() {
+		return this.presentation;
 	}
 
-	public void update(Presentation presentation, Slide data) {
-		if (data == null) {
-			repaint();
-			return;
-		}
-		this.presentation = presentation;
-		this.slide = data;
-		repaint();
-		frame.setTitle(presentation.getTitle());
-	}
-
-//Draw the slide
+	//Draw the slide itself + slide counter
 	public void paintComponent(Graphics g) {
+		this.repaint();
+		Slide slideTemp = presentation.getCurrentSlide();
 		g.setColor(BGCOLOR);
 		g.fillRect(0, 0, getSize().width, getSize().height);
-		if (presentation.getSlideNumber() < 0 || slide == null) {
+		if (presentation.getSlideNumber() < 0 || slideTemp == null) {
 			return;
 		}
 		g.setFont(labelFont);
 		g.setColor(COLOR);
-		g.drawString("Slide " + (1 + presentation.getSlideNumber()) + " of " +
-                 presentation.getSize(), XPOS, YPOS);
+		g.drawString("Slide " + (1 + this.presentation.getSlideNumber()) + " of " +
+                 this.presentation.getSize(), XPOS, YPOS);
 		Rectangle area = new Rectangle(0, YPOS, getWidth(), (getHeight() - YPOS));
-		slide.draw(g, area, this);
+		this.draw(g, area, slideTemp);
 	}
+
+	//Draw contents of the slide
+	public void draw(Graphics g, Rectangle area, Slide slide) {
+		float scale = getScale(area);
+		int y = area.y;
+
+		//The title is treated separately
+		SlideItem slideItemTitle = new TextItem(0, slide.getTitle());
+		Style style = JabberPoint.getStyle(slideItemTitle.getLevel());
+		slideItemTitle.draw(area.x, y, scale, g, style);
+		y += slideItemTitle.getBoundingBox(g, scale, style).height;
+
+		// Draw other contents of the slide
+		for (SlideItem slideItemLoop : slide.getSlideItems()) {
+			//Check if a slideItem is an image to give it an ImageObserver
+			if (slideItemLoop instanceof BitmapItem) {
+				BitmapItem bitmapItem = (BitmapItem) slideItemLoop;
+				bitmapItem.setImageObserver(this);
+			}
+			style = JabberPoint.getStyle(slideItemLoop.getLevel());
+			slideItemLoop.draw(area.x, y, scale, g, style);
+			y += slideItemLoop.getBoundingBox(g, scale, style).height;
+		}
+	}
+
+	//Returns the scale to draw a slide
+	private float getScale(Rectangle area) {
+		return Math.min(((float)area.width) / ((float)SlideViewerFrame.WIDTH), ((float)area.height) / ((float)SlideViewerFrame.HEIGHT));
+	}
+
 }

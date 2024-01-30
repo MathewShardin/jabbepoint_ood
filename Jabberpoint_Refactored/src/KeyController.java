@@ -11,12 +11,10 @@ import java.awt.event.KeyAdapter;
  * @version 1.6 2014/05/16 Sylvia Stuurman
 */
 
-public class KeyController extends KeyAdapter {
+public class KeyController extends KeyAdapter implements ControllerInterface {
 	private Presentation presentation; //Commands are given to the presentation
 
-	public KeyController(Presentation p) {
-		presentation = p;
-	}
+	public KeyController() {}
 
 	public void keyPressed(KeyEvent keyEvent) {
 		switch(keyEvent.getKeyCode()) {
@@ -38,5 +36,11 @@ public class KeyController extends KeyAdapter {
 			default:
 				break;
 		}
+	}
+
+	@Override
+	public void connectController(SlideViewerFrame viewerFrame) {
+		this.presentation = viewerFrame.getSlideViewerComponent().getPresentation();
+		viewerFrame.addKeyListener(this);
 	}
 }
