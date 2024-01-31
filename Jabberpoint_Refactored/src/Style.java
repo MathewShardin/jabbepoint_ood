@@ -31,10 +31,6 @@ public class Style {
 		return color;
 	}
 
-	public Font getFont() {
-		return font;
-	}
-
 	public int getFontSize() {
 		return fontSize;
 	}
